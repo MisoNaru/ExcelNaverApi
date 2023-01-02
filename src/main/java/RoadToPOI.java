@@ -1,6 +1,10 @@
 import org.apache.poi.xssf.usermodel.*;
 import org.json.simple.*;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import twitter4j.*;
+import twitter4j.conf.ConfigurationBuilder;
 
 
 import java.io.*;
@@ -12,8 +16,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import static Test.Twitter3.*;
 
-public class RoadToPOI_Two {
+
+public class RoadToPOI {
     public static void main(String[] args) throws Exception {
         XSSFWorkbook workbook = null;
         XSSFSheet sheet = null;
@@ -27,9 +33,12 @@ public class RoadToPOI_Two {
         String clientId = "GUaWvVMcEKIocayHZo3l"; //애플리케이션 클라이언트 아이디
         String clientSecret = "209scpyuN0"; //애플리케이션 클라이언트 시크릿
 
+
+
         /* 헤더 ----------------------------------------------------------------------------------------------------------------------------------------------------------- */
         String[] blogHeaders = {"SNS 구분", "SNS ID", "blog id 의 끝부분", "blog id 의 끝부분", "blog name", "사용자 이미지 URL", "title + description", "SNS URL", "생성일자", "생성일시", "사용여부"};
         String[] newsHeaders = {"SNS 구분", "SNS ID", "사용자 ID", "사용자명", "표시명", "이미지 URL", "title + description", "SNS URL", "생성일자", "생성일시", "사용여부"};
+        String[] twitterHeaders = {"SNS 구분", "SNS ID", "사용자 ID", "사용자명", "표시명", "이미지 URL", "title + description", "SNS URL", "생성일자", "생성일시", "사용여부"};
         /* --------------------------------------------------------------------------------------------------------------------------------------------------------------- */
 
         /* 질병코드 -------------------------------------------------------------------------------------------------------------------------------------------------------- */
@@ -72,11 +81,13 @@ public class RoadToPOI_Two {
                 , "클레브지엘라폐렴", "태변흡인증후군", "폐기종", "폐농양", "폐렴", "폐렴간균", "폐렴구균", "폐렴사슬알균폐렴", "폐렴혐기성세균", "폐염증", "폐침윤", "폐포성폐렴"
         };
 
-        String[] diseaseCodes_13 = {"영유아 수족구병", "71수족구병", "바이러스71수족구병", "발수포성발진", "소수포", "소수포구내염", "손발입병", "손수포성발진", "수족구"
+        String[] diseaseCodes_13 = {"영유아수족구", "71수족구병", "바이러스71수족구병", "발수포성발진", "소수포", "소수포구내염", "손발입병", "손수포성발진", "수족구"
                 , "수족구병", "수포구내염", "수포성발진", "에코바이러스", "엔테로바이러스", "입안궤양", "입안물집", "장바이러스", "콕사키바이러스", "통증성피부병변", "호흡기분비물"
         };
 
         String[] diseaseCodes_14 = {"copd", "기관지염", "만성기관지", "만성폐쇄성", "패색성폐질환", "폐기종", "폐쇄성질환", "폐쇄성폐질환"};
+
+        String[] diseaseCodes_15 = {"test"};
         /* --------------------------------------------------------------------------------------------------------------------------------------------------------------- */
 
         Map<String, String> itemMap = new HashMap<>();
@@ -92,7 +103,7 @@ public class RoadToPOI_Two {
         int row_num = -1;
         workbook = new XSSFWorkbook();
         sheet = workbook.createSheet("블로그");
-        for (String s : diseaseCodes_2) {
+        for (String s : diseaseCodes_14) {
             String text = null;
             try {
                 text = URLEncoder.encode(s, "UTF-8");
@@ -101,7 +112,7 @@ public class RoadToPOI_Two {
             }
             String texts = URLDecoder.decode(text, "UTF-8"); // 이렇게 해야 tesxts = 감기
 
-            String apiURLBlog = "https://openapi.naver.com/v1/search/blog.json?query=" + text + "&sort=date&display=51";
+            String apiURLBlog = "https://openapi.naver.com/v1/search/blog.json?query=" + text + "&sort=date&display=100";
 
             Map<String, String> requestHeaders = new HashMap<>();
 
@@ -127,8 +138,6 @@ public class RoadToPOI_Two {
                 String postdate = itemsObject.get("postdate").toString();
                 String postDateTime = itemsObject.get("postdate").toString() + "0000";
 
-//                if (Objects.equals(itemsObject.get("postdate").toString(), now.format(formatt).toString())){
-
 
                 itemMap.put("SnsID", SnsId);
                 itemMap.put("blogEnd", blogEnd);
@@ -137,45 +146,44 @@ public class RoadToPOI_Two {
                 itemMap.put("link", link);
                 itemMap.put("postdate", postdate);
                 itemMap.put("postDateTime", postDateTime);
-//                }
 
-
+//                if (postdate.equals(datetime)) row_num++;
                 row_num++;
-
-                itemList.add(itemMap);
-//                System.out.println(row_num + ".SnsID ===> " + itemMap.get("SnsID"));
-
                 row = sheet.createRow(row_num);
 
-                for (int k = 0; k < blogHeaders.length; k++) {
-                    cell = row.createCell(k);
-
-                    if (row_num == 0) {
-                        cell.setCellValue(new XSSFRichTextString(blogHeaders[k]));
-                    } else {
-                        if (k == 0) {
-                            cell.setCellValue("B");
-                        } else if (k == 1) {
-                            cell.setCellValue(itemMap.get("SnsID"));
-                        } else if (k == 2 || k == 3) {
-                            cell.setCellValue(itemMap.get("blogEnd"));
-                        } else if (k == 4) {
-                            cell.setCellValue(itemMap.get("bloggerName"));
-                        } else if (k == 5) {
-                            cell.setCellValue("");
-                        } else if (k == 6) {
-                            cell.setCellValue(itemMap.get("titleAndDescription"));
-                        } else if (k == 7) {
-                            cell.setCellValue(itemMap.get("link"));
-                        } else if (k == 8) {
-                            cell.setCellValue(itemMap.get("postdate"));
-                        } else if (k == 9) {
-                            cell.setCellValue(itemMap.get("postDateTime"));
-                        } else if (k == 10) {
-                            cell.setCellValue("Y");
+                if (postdate.equals(datetime)) {
+//                if (postdate.equals("20221231")) {
+                    for (int k = 0; k < blogHeaders.length; k++) {
+                        cell = row.createCell(k);
+                        if (row_num == 0) {
+                            cell.setCellValue(new XSSFRichTextString(blogHeaders[k]));
+                        } else {
+                            if (k == 0) {
+                                cell.setCellValue("B");
+                            } else if (k == 1) {
+                                cell.setCellValue(itemMap.get("SnsID"));
+                            } else if (k == 2 || k == 3) {
+                                cell.setCellValue(itemMap.get("blogEnd"));
+                            } else if (k == 4) {
+                                cell.setCellValue(itemMap.get("bloggerName"));
+                            } else if (k == 5) {
+                                cell.setCellValue("");
+                            } else if (k == 6) {
+                                cell.setCellValue(itemMap.get("titleAndDescription"));
+                            } else if (k == 7) {
+                                cell.setCellValue(itemMap.get("link"));
+                            } else if (k == 8) {
+                                cell.setCellValue(itemMap.get("postdate"));
+                            } else if (k == 9) {
+                                cell.setCellValue(itemMap.get("postDateTime"));
+                            } else if (k == 10) {
+                                cell.setCellValue("Y");
+                            }
                         }
                     }
-                }
+                } else continue;
+
+
             }
         }
 
@@ -183,7 +191,7 @@ public class RoadToPOI_Two {
         // 뉴스 시트
         row_num = -1;
 
-        for (String s : diseaseCodes_2) {
+        for (String s : diseaseCodes_14) {
             String text = null;
             try {
                 text = URLEncoder.encode(s, "UTF-8");
@@ -192,7 +200,7 @@ public class RoadToPOI_Two {
             }
             String texts = URLDecoder.decode(text, "UTF-8"); // 이렇게 해야 tesxts = 감기
 
-            String apiURLNews = "https://openapi.naver.com/v1/search/news.json?query=" + text + "&sort=date&display=51";
+            String apiURLNews = "https://openapi.naver.com/v1/search/news.json?query=" + text + "&sort=date&display=100";
 
             Map<String, String> requestHeadersNews = new HashMap<>();
 
@@ -224,56 +232,124 @@ public class RoadToPOI_Two {
                 String postdate = localDateTimeToString.substring(0, 8);
                 String postDateTime = localDateTimeToString;
 
-//                if (Objects.equals(newsObject.get("postdate").toString(), now.format(formatt).toString())){
                 newsItemMap.put("SnsID", SnsId);
                 newsItemMap.put("titleAndDescription", titleAndDescription);
                 newsItemMap.put("link", link);
                 newsItemMap.put("postdate", postdate);
                 newsItemMap.put("postDateTime", postDateTime);
-//                }
 
-
+//                if (postdate.equals(datetime)) row_num++;
 
                 row_num++;
-
-                newsItemList.add(newsItemMap);
-
-//                System.out.println(row_num + ".SnsID ===> " + newsItemMap.get("SnsID"));
+//                newsItemList.add(newsItemMap);
 
                 row = sheet.createRow(row_num);
 
-                for (int k = 0; k < newsHeaders.length; k++) {
-                    cell = row.createCell(k);
+                if (postdate.equals(datetime)) {
+//                if (postdate.equals("20221231")) {
+                    for (int k = 0; k < newsHeaders.length; k++) {
+                        cell = row.createCell(k);
 
-                    if (row_num == 0) {
-                        cell.setCellValue(new XSSFRichTextString(newsHeaders[k]));
-                    } else {
-                        if (k == 0) {
-                            cell.setCellValue("N");
-                        } else if (k == 1) {
-                            cell.setCellValue(newsItemMap.get("SnsID"));
-                        } else if (k >= 2 && k <= 5) {
-                            cell.setCellValue("");
-                        } else if (k == 6) {
-                            cell.setCellValue(newsItemMap.get("titleAndDescription"));
-                        } else if (k == 7) {
-                            cell.setCellValue(newsItemMap.get("link"));
-                        } else if (k == 8) {
-                            cell.setCellValue(newsItemMap.get("postdate"));
-                        } else if (k == 9) {
-                            cell.setCellValue(newsItemMap.get("postDateTime"));
-                        } else if (k == 10) {
-                            cell.setCellValue("Y");
+                        if (row_num == 0) {
+                            cell.setCellValue(new XSSFRichTextString(newsHeaders[k]));
+                        } else {
+                            if (k == 0) {
+                                cell.setCellValue("N");
+                            } else if (k == 1) {
+                                cell.setCellValue(newsItemMap.get("SnsID"));
+                            } else if (k >= 2 && k <= 5) {
+                                cell.setCellValue("");
+                            } else if (k == 6) {
+                                cell.setCellValue(newsItemMap.get("titleAndDescription"));
+                            } else if (k == 7) {
+                                cell.setCellValue(newsItemMap.get("link"));
+                            } else if (k == 8) {
+                                cell.setCellValue(newsItemMap.get("postdate"));
+                            } else if (k == 9) {
+                                cell.setCellValue(newsItemMap.get("postDateTime"));
+                            } else if (k == 10) {
+                                cell.setCellValue("Y");
+                            }
                         }
                     }
+                } else {
+                    continue;
                 }
-
             }
         }
+
+        // 트위터
+//        sheet = workbook.createSheet("트위터");
+        // 뉴스 시트
+//        row_num = -1;
+
+        // 트위터 엑셀 생성
+//        Twitter tw = getT();
+//        BufferedWriter bw = null;
+//        for (int i = 0; i < diseaseCodes_14.length; i++) {
+//            Query query = new Query(diseaseCodes_14[i]);
+//            QueryResult result = null;
+//            result = tw.search(query);
+//
+//            for (Status status : result.getTweets()) {
+//                String twitterUserId = String.valueOf(status.getId());
+//                String twitterUserName = status.getUser().getName();
+//                String twitterScreenName = status.getUser().getScreenName();
+//                String twitterText = status.getText();
+//                String twitterUrl = status.getSource();
+//
+//                String twitterPostDateTime = null;
+//                SimpleDateFormat recvSimpleFormat = new SimpleDateFormat("E MMM dd HH:mm:ss z yyyy", Locale.ENGLISH);
+//                SimpleDateFormat tranSimpleFormat = new SimpleDateFormat("yyyyMMddHHmmss", Locale.ENGLISH);
+//
+//                Date data = recvSimpleFormat.parse(String.valueOf(status.getCreatedAt()));
+//                twitterPostDateTime = tranSimpleFormat.format(data);
+//                String twitterPostDate = twitterPostDateTime.substring(0, 8);
+//
+//                row_num++;
+//                row = sheet.createRow(row_num);
+//
+//                    for (int k = 0; k < twitterHeaders.length; k++) {
+//                        cell = row.createCell(k);
+//                    if (twitterPostDate.equals(datetime)) {
+////                    if (twitterPostDate.equals("20221217")) {
+//                        if (row_num == 0) {
+//                            cell.setCellValue(new XSSFRichTextString(twitterHeaders[k]));
+//                        } else {
+//                            if (k == 0) {
+//                                cell.setCellValue("T");
+//                            } else if (k == 1) {
+//                                cell.setCellValue(twitterUserId);
+//                            } else if (k == 2) {
+//                                cell.setCellValue("");
+//                            } else if (k == 3) {
+//                                cell.setCellValue(twitterUserName);
+//                            } else if (k > 3 && k <= 5) {
+//                                cell.setCellValue("");
+//                            } else if (k == 6) {
+//                                cell.setCellValue(twitterText);
+//                            } else if (k == 7) {
+//                                cell.setCellValue(twitterUrl);
+//                            } else if (k == 8) {
+//                                cell.setCellValue(twitterPostDate);
+//                            } else if (k == 9) {
+//                                cell.setCellValue(twitterPostDateTime);
+//                            } else if (k == 10) {
+//                                cell.setCellValue("Y");
+//                            }
+//                        }
+//                    } else{
+//                        continue;
+//                    }
+//                }
+//            }
+//
+//        }
+
+
         try {
-//            File xlsFile = new File("/Users/misonaru/Desktop/" + diseaseCodes_2[0] + "_" + datetime + ".xls");
-            File xlsFile = new File("/Users/misonaru/Desktop/" + diseaseCodes_2[0] + "_total.xls");
-//            File xlsFile = new File("/Users/misonaru/Desktop/hi2.xls");
+            File xlsFile = new File("/Users/misonaru/Desktop/" + diseaseCodes_14[0] + "_" + datetime + ".xlsx");
+//            File xlsFile = new File("/Users/misonaru/Desktop/" + diseaseCodes_14[0] + "_" + "20221231" + ".xlsx");
             FileOutputStream fileOut = new FileOutputStream(xlsFile);
             workbook.write(fileOut);
         } catch (IOException e) {
@@ -334,6 +410,27 @@ public class RoadToPOI_Two {
         } catch (IOException e) {
             throw new RuntimeException("API 응답을 읽는 데 실패했습니다.", e);
         }
+    }
+
+    static Twitter getT() {
+
+        String ConsumerKey = "fn6COOtYtGl9rDkVw6sAwG9Zd";
+        String ConsumerSecret = "ZH9TBhlKikp9L6slybUjUrxP6RewQLfozU4tsaPKepCF7mdbFG";
+        String AccessToken = "1597508900982398978-c66cQHr54TgdOs0oBYHMjDbQYhpBIN";
+        String AccessTokenSecret = "tMOf3fOrsGIQZJC8v6tIkOQHT5mn5eYKj9nMc4h3XZefr";
+
+        ConfigurationBuilder cb = new ConfigurationBuilder();
+
+        cb.setDebugEnabled(true)
+                .setOAuthConsumerKey(ConsumerKey)
+                .setOAuthConsumerSecret(ConsumerSecret)
+                .setOAuthAccessToken(AccessToken)
+                .setOAuthAccessTokenSecret(AccessTokenSecret);
+
+        TwitterFactory fac = new TwitterFactory(cb.build());
+        Twitter twitter = fac.getInstance();
+
+        return twitter;
     }
 
 }

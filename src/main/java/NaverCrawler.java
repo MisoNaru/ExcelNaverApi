@@ -14,12 +14,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 
-/**
- * 네이버 블로그 크롤링
- *
- * @author steel
- * @since 2021.02.24
- */
 public class NaverCrawler {
     // 베이스 URL
     final String baseUrl = "https://openapi.naver.com/v1/search/blog.json?query=";
