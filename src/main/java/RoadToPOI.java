@@ -87,6 +87,8 @@ public class RoadToPOI {
 
         String[] diseaseCodes_14 = {"copd", "기관지염", "만성기관지", "만성폐쇄성", "패색성폐질환", "폐기종", "폐쇄성질환", "폐쇄성폐질환"};
 
+        String[] news_code = {"sars", "눈병", "급성설사", "감염성천식", "피부염", "뇌혈관질환", "영유아폐렴", "영유아수족구", "copd"};
+
         /* --------------------------------------------------------------------------------------------------------------------------------------------------------------- */
 
         Map<String, String> itemMap = new HashMap<>();
@@ -160,7 +162,7 @@ public class RoadToPOI {
                             if (k == 0) {
                                 cell.setCellValue("B");
                             } else if (k == 1) {
-                                cell.setCellValue(itemMap.get("SnsID"));
+                                cell.setCellValue(itemMap.get("SnsID")); // 빈 값일 경우에 스킵
                             } else if (k == 2 || k == 3) {
                                 cell.setCellValue(itemMap.get("blogEnd"));
                             } else if (k == 4) {
@@ -190,10 +192,11 @@ public class RoadToPOI {
         // 뉴스 시트
         row_num = -1;
 
-        for (String s : diseaseCodes_14) {
+//        for (String s : diseaseCodes_14) {
             String text = null;
             try {
-                text = URLEncoder.encode(s, "UTF-8");
+//                text = URLEncoder.encode(s, "UTF-8");
+                text = URLEncoder.encode(news_code[8], "UTF-8");
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException("검색어 인코딩 실패", e);
             }
@@ -275,76 +278,7 @@ public class RoadToPOI {
                     continue;
                 }
             }
-        }
-
-        // 트위터
-//        sheet = workbook.createSheet("트위터");
-        // 뉴스 시트
-//        row_num = -1;
-
-        // 트위터 엑셀 생성
-//        Twitter tw = getT();
-//        BufferedWriter bw = null;
-//        for (int i = 0; i < diseaseCodes_14.length; i++) {
-//            Query query = new Query(diseaseCodes_14[i]);
-//            QueryResult result = null;
-//            result = tw.search(query);
-//
-//            for (Status status : result.getTweets()) {
-//                String twitterUserId = String.valueOf(status.getId());
-//                String twitterUserName = status.getUser().getName();
-//                String twitterScreenName = status.getUser().getScreenName();
-//                String twitterText = status.getText();
-//                String twitterUrl = status.getSource();
-//
-//                String twitterPostDateTime = null;
-//                SimpleDateFormat recvSimpleFormat = new SimpleDateFormat("E MMM dd HH:mm:ss z yyyy", Locale.ENGLISH);
-//                SimpleDateFormat tranSimpleFormat = new SimpleDateFormat("yyyyMMddHHmmss", Locale.ENGLISH);
-//
-//                Date data = recvSimpleFormat.parse(String.valueOf(status.getCreatedAt()));
-//                twitterPostDateTime = tranSimpleFormat.format(data);
-//                String twitterPostDate = twitterPostDateTime.substring(0, 8);
-//
-//                row_num++;
-//                row = sheet.createRow(row_num);
-//
-//                    for (int k = 0; k < twitterHeaders.length; k++) {
-//                        cell = row.createCell(k);
-//                    if (twitterPostDate.equals(datetime)) {
-////                    if (twitterPostDate.equals("20221217")) {
-//                        if (row_num == 0) {
-//                            cell.setCellValue(new XSSFRichTextString(twitterHeaders[k]));
-//                        } else {
-//                            if (k == 0) {
-//                                cell.setCellValue("T");
-//                            } else if (k == 1) {
-//                                cell.setCellValue(twitterUserId);
-//                            } else if (k == 2) {
-//                                cell.setCellValue("");
-//                            } else if (k == 3) {
-//                                cell.setCellValue(twitterUserName);
-//                            } else if (k > 3 && k <= 5) {
-//                                cell.setCellValue("");
-//                            } else if (k == 6) {
-//                                cell.setCellValue(twitterText);
-//                            } else if (k == 7) {
-//                                cell.setCellValue(twitterUrl);
-//                            } else if (k == 8) {
-//                                cell.setCellValue(twitterPostDate);
-//                            } else if (k == 9) {
-//                                cell.setCellValue(twitterPostDateTime);
-//                            } else if (k == 10) {
-//                                cell.setCellValue("Y");
-//                            }
-//                        }
-//                    } else{
-//                        continue;
-//                    }
-//                }
-//            }
-//
 //        }
-
 
         try {
             File xlsFile = new File("/Users/misonaru/Desktop/" + diseaseCodes_14[0] + "_" + datetime + ".xlsx");
@@ -365,7 +299,6 @@ public class RoadToPOI {
             for (Map.Entry<String, String> header : requestHeaders.entrySet()) {
                 con.setRequestProperty(header.getKey(), header.getValue());
             }
-
 
             int responseCode = con.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) { // 정상 호출
