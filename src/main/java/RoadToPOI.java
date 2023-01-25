@@ -60,8 +60,6 @@ public class RoadToPOI {
         String[] diseaseCodes_13 = {"영유아수족구", "71수족구병", "바이러스71수족구병", "발수포성발진", "소수포", "소수포구내염", "손발입병", "손수포성발진", "수족구", "수족구병", "수포구내염", "수포성발진", "에코바이러스", "엔테로바이러스", "입안궤양", "입안물집", "장바이러스", "콕사키바이러스", "통증성피부병변", "호흡기분비물"};
 
         String[] diseaseCodes_14 = {"copd", "기관지염", "만성기관지", "만성폐쇄성", "패색성폐질환", "폐기종", "폐쇄성질환", "폐쇄성폐질환"};
-
-        String[] diseaseCodes_15 = {"test"};
         /* --------------------------------------------------------------------------------------------------------------------------------------------------------------- */
 
         Map<String, String> itemMap = new HashMap<>();
@@ -77,7 +75,7 @@ public class RoadToPOI {
         int row_num = -1;
         workbook = new XSSFWorkbook();
         sheet = workbook.createSheet("블로그");
-        for (String s : diseaseCodes_1) {
+        for (String s : diseaseCodes_3) {
             String text = null;
             try {
                 text = URLEncoder.encode(s, "UTF-8");
@@ -90,7 +88,9 @@ public class RoadToPOI {
 
             Map<String, String> requestHeaders = new HashMap<>();
 
-            // 블로그 정보 MAP
+            /***********************************************************************************************************
+            -------------------------------------------- 블로그 정보 ------------------------------------------------------
+            ***********************************************************************************************************/
             requestHeaders.put("X-Naver-Client-Id", clientId);
             requestHeaders.put("X-Naver-Client-Secret", clientSecret);
             String responseBodyBlog = get(apiURLBlog, requestHeaders);
@@ -161,13 +161,12 @@ public class RoadToPOI {
         }
 
         sheet = workbook.createSheet("뉴스");
-        /*
-         * 뉴스
-         */
-        // 뉴스 시트
+        /***********************************************************************************************************
+         ------------------------------------------------ 뉴스 ------------------------------------------------------
+         ***********************************************************************************************************/
         row_num = -1;
 
-        for (String s : diseaseCodes_1) {
+        for (String s : diseaseCodes_3) {
             String text = null;
             try {
                 text = URLEncoder.encode(s, "UTF-8");
@@ -253,8 +252,8 @@ public class RoadToPOI {
         }
 
         try {
-            File xlsFile = new File("/Users/misonaru/Desktop/" + diseaseCodes_1[0] + "_" + datetime + ".xlsx");
-//            File xlsFile = new File("/Users/misonaru/Desktop/" + diseaseCodes_1[0] + "_" + "20230125" + ".xlsx");
+            File xlsFile = new File("/Users/misonaru/Desktop/" + diseaseCodes_3[0] + "_" + datetime + ".xlsx");
+//            File xlsFile = new File("/Users/misonaru/Desktop/" + diseaseCodes_3[0] + "_" + "20230125" + ".xlsx");
             FileOutputStream fileOut = new FileOutputStream(xlsFile);
             workbook.write(fileOut);
         } catch (IOException e) {
