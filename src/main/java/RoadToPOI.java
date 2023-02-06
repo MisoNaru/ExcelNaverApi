@@ -49,6 +49,7 @@ public class RoadToPOI {
         String[] diseaseCodes_7 = {"영유아폐렴", "폐포염증", "포도상구균폐렴", "포도알균폐렴", "호산구성폐렴", "호흡기분비물전파되다", "호흡기세포융합바이러스", "흉곽함몰", "흉부통증", "흡인성폐렴", "흡인폐렴", "rs바이러스", "간질성폐렴", "간질폐렴", "감염성폐렴", "객담", "결핵성폐렴", "경기관지폐생검", "곰팡이전염폐렴", "과민성폐렴", "그람음성간균", "급성간질성폐렴", "급성폐렴", "기관지폐렴", "기관지확장증", "대엽성폐렴", "독감바이러스성폐렴", "레지오넬라증", "레지오넬라폐렴", "리케차성폐렴", "림프구간질성폐렴", "만성폐렴", "모세기관지염", "무기폐", "미생물감염성페렴", "미생물감염성폐렴", "바이러스성폐렴", "방사선폐렴", "병조성폐렴", "보행폐렴", "분비물전파되다", "비감염성폐렴", "빈호흡", "상기도증후군", "색가래", "세균성폐렴", "세기관지염", "소아폐렴", "소엽 폐렴", "소엽폐렴", "신종인플루엔자폐렴", "알레르기성폐렴", "약제유발성폐렴", "연쇄상구균폐렴", "염증성호흡기질환", "원발성이형폐렴", "이형폐렴", "중증폐렴", "지역사회획득폐렴", "진균성폐렴", "진균증에서의폐렴", "침강폐렴", "크라미디아폐렴", "클레브지엘라폐렴", "태변흡인증후군", "폐기종", "폐농양", "폐렴", "폐렴간균", "폐렴구균", "폐렴사슬알균폐렴", "폐렴혐기성세균", "폐염증", "폐침윤", "폐포성폐렴"};
         String[] diseaseCodes_8 = {"영유아수족구", "71수족구병", "바이러스71수족구병", "발수포성발진", "소수포", "소수포구내염", "손발입병", "손수포성발진", "수족구", "수족구병", "수포구내염", "수포성발진", "에코바이러스", "엔테로바이러스", "입안궤양", "입안물집", "장바이러스", "콕사키바이러스", "통증성피부병변", "호흡기분비물"};
         String[] diseaseCodes_9 = {"copd", "기관지염", "만성기관지", "만성폐쇄성", "패색성폐질환", "폐기종", "폐쇄성질환", "폐쇄성폐질환"};
+
         /* --------------------------------------------------------------------------------------------------------------------------------------------------------------- */
 
         Map<String, String> itemMap = new HashMap<>();
@@ -85,8 +86,8 @@ public class RoadToPOI {
             Map<String, String> requestHeaders = new HashMap<>();
 
             /***********************************************************************************************************
-            -------------------------------------------- 블로그 정보 ------------------------------------------------------
-            ***********************************************************************************************************/
+             -------------------------------------------- 블로그 정보 ------------------------------------------------------
+             ***********************************************************************************************************/
             requestHeaders.put("X-Naver-Client-Id", clientId);
             requestHeaders.put("X-Naver-Client-Secret", clientSecret);
             String responseBodyBlog = get(apiURLBlog, requestHeaders);
@@ -110,8 +111,16 @@ public class RoadToPOI {
                 String postdate = itemsObject.get("postdate").toString();
                 String postDateTime = itemsObject.get("postdate").toString() + "0000";
 
-                if (postdate.equals(datetime) && blogEnd != null) {
-//                if (postdate.equals("20230127")) {
+                if (postdate.equals(datetime)
+                        && SnsId != null && !SnsId.equals("")
+                        && blogEnd != null && !blogEnd.equals("")
+                        && bloggerName != null && !bloggerName.equals("")
+                        && titleAndDescription != null && !titleAndDescription.equals("")
+                        && link != null && !link.equals("")
+                        && postdate != null && !postdate.equals("")
+                        && postDateTime != null && !postDateTime.equals("")) {
+//                if (postdate.equals("20230204") && SnsId != null && blogEnd != null && bloggerName != null
+//                        && titleAndDescription != null && link != null && postdate != null && postDateTime != null ) {
                     itemMap.put("SnsID", SnsId);
                     itemMap.put("blogEnd", blogEnd);
                     itemMap.put("bloggerName", bloggerName);
@@ -225,8 +234,14 @@ public class RoadToPOI {
                 String postdate = localDateTimeToString.substring(0, 8);
                 String postDateTime = localDateTimeToString;
 
-                if (postdate.equals(datetime)) {
-//                if (postdate.equals("20230127")) {
+                if (postdate.equals(datetime)
+                        && SnsId != null && !SnsId.equals("")
+                        && titleAndDescription != null && !titleAndDescription.equals("")
+                        && link != null && !link.equals("")
+                        && postdate != null && !postdate.equals("")
+                        && postDateTime != null && !postDateTime.equals("")) {
+//                if (postdate.equals("20230204") && SnsId != null && titleAndDescription != null && link != null
+//                        && postdate != null && postDateTime != null ) {
                     newsItemMap.put("SnsID", SnsId);
                     newsItemMap.put("titleAndDescription", titleAndDescription);
                     newsItemMap.put("link", link);
