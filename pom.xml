@@ -48,6 +48,12 @@
             <artifactId>aspose-cells</artifactId>
             <version>22.10</version>
         </dependency>
+        <dependency>
+            <groupId>com.aspose</groupId>
+            <artifactId>aspose-cells</artifactId>
+            <version>21.9</version>
+        </dependency>
+
 
     </dependencies>
 
