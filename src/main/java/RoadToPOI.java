@@ -31,7 +31,8 @@ public class RoadToPOI {
         String datetime = sdf.format(time.getTime());
 
         String clientId = "GUaWvVMcEKIocayHZo3l"; //애플리케이션 클라이언트 아이디
-        String clientSecret = "209scpyuN0"; //애플리케이션 클라이언트 시크릿
+        String clientSecret = "sCFW8kRDRl";
+//        String clientSecret = "209scpyuN0"; //애플리케이션 클라이언트 시크릿
 
         /* 헤더 ----------------------------------------------------------------------------------------------------------------------------------------------------------- */
         String[] blogHeaders = {"SNS 구분", "SNS ID", "blog id 의 끝부분", "blog id 의 끝부분", "blog name", "사용자 이미지 URL", "title + description", "SNS URL", "생성일자", "생성일시", "사용여부", "구분코드"};
@@ -52,6 +53,10 @@ public class RoadToPOI {
         String[] diseaseCodes_10 = {"온열질환"}; //15
         String[] diseaseCodes_11 = {"내혈관질환"};    //16
 
+        String[] diseaseCode_12 = {"온열질환", "열사병", "열탈진", "열경련", "열실신"};
+        String[] diseaseCode_13 = {"심뇌혈관질환", "심장질환", "심근경색", "협심증", "뇌졸증", "뇌혈관질환", "심혈관 질환", "관상동맥질환", "관상동맥 증후군", "심근경색증", "협심증", "허혈성 심장병", "심부전", "뇌졸증", "뇌내출혈", "지주막하출혈", "뇌경색증"};
+
+
         String titleCode = "";
 
         /* --------------------------------------------------------------------------------------------------------------------------------------------------------------- */
@@ -70,6 +75,7 @@ public class RoadToPOI {
             질병 코드 설정
          */
         String currentCode = diseaseCodes_11[0];
+        String curDate = "20230411";
 
 
         int row_num = -1;
@@ -80,14 +86,13 @@ public class RoadToPOI {
             String text = null;
             try {
                 text = URLEncoder.encode(s, "UTF-8");
-                System.out.println("text:" + text);
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException("검색어 인코딩 실패", e);
             }
             String texts = URLDecoder.decode(text, "UTF-8"); // 이렇게 해야 tesxts = 감기
-            System.out.println("texts:" + texts);
 
             String apiURLBlog = "https://openapi.naver.com/v1/search/blog.json?query=" + text + "&sort=date&display=100";
+//            String apiURLBlog = "https://openapi.naver.com/v1/search/blog.json?query=" + text + "&sort=sim&display=100";
 
             Map<String, String> requestHeaders = new HashMap<>();
 
@@ -126,7 +131,7 @@ public class RoadToPOI {
 //                        && postdate != null && !postdate.equals("")
 //                        && postDateTime != null && !postDateTime.equals("")) {
 
-                if (postdate.equals("20230210")
+                if (postdate.equals(curDate)
                         && SnsId != null && !SnsId.equals("")
                         && blogEnd != null && !blogEnd.equals("")
                         && bloggerName != null && !bloggerName.equals("")
@@ -135,8 +140,6 @@ public class RoadToPOI {
                         && postdate != null && !postdate.equals("")
                         && postDateTime != null && !postDateTime.equals(""))
                 {
-
-
                     itemMap.put("SnsID", SnsId);
                     itemMap.put("blogEnd", blogEnd);
                     itemMap.put("bloggerName", bloggerName);
@@ -220,6 +223,7 @@ public class RoadToPOI {
             String texts = URLDecoder.decode(text, "UTF-8"); // 이렇게 해야 tesxts = 감기
 
             String apiURLNews = "https://openapi.naver.com/v1/search/news.json?query=" + text + "&sort=date&display=100";
+//            String apiURLNews = "https://openapi.naver.com/v1/search/news.json?query=" + text + "&sort=sim&display=100";
 
             Map<String, String> requestHeadersNews = new HashMap<>();
 
@@ -232,6 +236,7 @@ public class RoadToPOI {
             JSONObject jsonObjectNews = (JSONObject) jsonParser.parse(responseBodyNews);    // 뉴스
 
             JSONArray newsItmes = (JSONArray) jsonObjectNews.get("items");
+//            System.out.println(newsItmes);
 
             // 뉴스 엑셀 생성
             for (int j = 0; j < newsItmes.size(); j++) {
@@ -257,7 +262,7 @@ public class RoadToPOI {
 //                        && link != null && !link.equals("")
 //                        && postdate != null && !postdate.equals("")
 //                        && postDateTime != null && !postDateTime.equals("")) {
-                if (postdate.equals("20230210")
+                if (postdate.equals(curDate)
                         && SnsId != null && !SnsId.equals("")
                         && titleAndDescription != null && !titleAndDescription.equals("")
                         && link != null && !link.equals("")
@@ -270,6 +275,7 @@ public class RoadToPOI {
                     newsItemMap.put("postdate", postdate);
                     newsItemMap.put("postDateTime", postDateTime);
                 } else continue;
+//
 
                 row_num++;
                 row = sheet.createRow(row_num);
@@ -348,11 +354,9 @@ public class RoadToPOI {
         }
 
         try {
-//            File xlsFile = new File("/Users/misonaru/Desktop/" + datetime + "_" + titleCode + ".xlsx");
-            File xlsFile = new File("/Users/misonaru/Desktop/" + "20230210" + "_" + titleCode + ".xlsx");
+            File xlsFile = new File("/Users/misonaru/Desktop/" + curDate + "_" + titleCode + ".xlsx");
+//            File xlsFile = new File("/Users/misonaru/Desktop/" + curDate + "_" + currentCode + ".xlsx");
 
-//            File xlsFile = new File("/Users/misonaru/Desktop/" + diseaseCodes_1[0] + "_" + datetime + ".xlsx");
-//            File xlsFile = new File("/Users/misonaru/Desktop/" + diseaseCodes_1[0] + "_" + "20231027" + ".xlsx");
             FileOutputStream fileOut = new FileOutputStream(xlsFile);
             workbook.write(fileOut);
         } catch (
